@@ -1,0 +1,102 @@
+.page-container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-shrink: 0;
+
+  .search-input {
+    width: 300px;
+  }
+}
+
+.filter-tags {
+  display: flex;
+  gap: 12px;
+
+  .filter-tag {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #f3f4f6;
+    color: #6b7280;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #e5e7eb;
+    }
+
+    &.active {
+      background: #3b82f6;
+      color: #fff;
+    }
+  }
+}
+
+.scenario-list {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2937;
+      margin: 0;
+    }
+  }
+}
+
+.full-width-table {
+  flex: 1;
+  border-radius: 0;
+  box-shadow: none;
+  border-top: 1px solid #f3f4f6;
+  margin-top: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  :deep(.el-table) {
+    width: 100%;
+    flex: 1;
+  }
+
+  :deep(.el-table__header-wrapper) {
+    flex-shrink: 0;
+  }
+
+  :deep(.el-table__body-wrapper) {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
+
+.badge-low { background: #D1FAE5; color: #059669; padding: 4px 10px; border-radius: 8px; font-size: 12px; }
+.badge-medium { background: #FEF3C7; color: #D97706; padding: 4px 10px; border-radius: 8px; font-size: 12px; }
+.badge-high { background: #FECACA; color: #DC2626; padding: 4px 10px; border-radius: 8px; font-size: 12px; }
+.badge-critical { background: #FEE2E2; color: #B91C1C; padding: 4px 10px; border-radius: 8px; font-size: 12px; }
+.badge-urgent { background: #FEE2E2; color: #B91C1C; padding: 4px 10px; border-radius: 8px; font-size: 12px; }
