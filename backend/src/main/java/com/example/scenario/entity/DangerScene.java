@@ -1,6 +1,7 @@
 package com.example.scenario.entity;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -33,6 +34,7 @@ public class DangerScene {
     private Integer caseCount;
 
     @Column(name = "storage_time")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate storageTime;
 
     public DangerScene() {}

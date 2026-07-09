@@ -55,12 +55,25 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import * as icons from '@element-plus/icons-vue'
-import { dangerSceneList } from '@/data/mockData'
+import { getDangerScenes } from '@/api/dangerScene'
+import { parseTags } from '@/utils'
 import SceneDetailDrawer from '@/components/drawers/SceneDetailDrawer.vue'
 
-const sceneList = ref([...dangerSceneList])
+const sceneList = ref([])
+
+onMounted(async () => {
+  try {
+    const res = await getDangerScenes()
+    sceneList.value = (res.data || []).map(item => ({
+      ...item,
+      tags: parseTags(item.tags)
+    }))
+  } catch (err) {
+    console.error('获取危险场景列表失败:', err)
+  }
+})
 const searchKeyword = ref('')
 const categoryFilter = ref('')
 const showDetailModal = ref(false)

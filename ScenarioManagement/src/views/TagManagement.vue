@@ -81,14 +81,36 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import * as icons from '@element-plus/icons-vue'
-import { tagList } from '@/data/mockData'
+import { getTagsGrouped, createTag, deleteTag, getTags } from '@/api/tag'
 
-const tagGroups = ref([...tagList])
+const tagGroups = ref([])
+const flatTags = ref([])
 const showAddModal = ref(false)
 const showTagModal = ref(false)
 const currentGroup = ref(null)
+
+const fetchData = async () => {
+  try {
+    const [groupedData, flatData] = await Promise.all([
+      getTagsGrouped(),
+      getTags()
+    ])
+    tagGroups.value = Object.entries(groupedData).map(([name, tags], index) => ({
+      id: index + 1,
+      name,
+      tags: [...tags]
+    }))
+    flatTags.value = flatData
+  } catch (e) {
+    console.error('Failed to load tags:', e)
+  }
+}
+
+onMounted(() => {
+  fetchData()
+})
 
 const groupForm = ref({
   name: '',
@@ -105,18 +127,32 @@ const addTagToGroup = (group) => {
   showTagModal.value = true
 }
 
-const handleAddTag = () => {
+const handleAddTag = async () => {
   if (tagForm.value.name && currentGroup.value) {
-    currentGroup.value.tags.push(tagForm.value.name)
-    showTagModal.value = false
-    tagForm.value = { name: '' }
+    try {
+      await createTag({ category: currentGroup.value.name, name: tagForm.value.name })
+      currentGroup.value.tags.push(tagForm.value.name)
+      showTagModal.value = false
+      tagForm.value = { name: '' }
+    } catch (e) {
+      console.error('Failed to create tag:', e)
+    }
   }
 }
 
-const removeTag = (groupId, index) => {
+const removeTag = async (groupId, index) => {
   const group = tagGroups.value.find(g => g.id === groupId)
   if (group) {
-    group.tags.splice(index, 1)
+    const tagName = group.tags[index]
+    const flatTag = flatTags.value.find(t => t.category === group.name && t.name === tagName)
+    try {
+      if (flatTag) {
+        await deleteTag(flatTag.id)
+      }
+      group.tags.splice(index, 1)
+    } catch (e) {
+      console.error('Failed to delete tag:', e)
+    }
   }
 }
 
@@ -128,15 +164,22 @@ const deleteGroup = (group) => {
   console.log('删除标签组:', group)
 }
 
-const handleAddGroup = () => {
+const handleAddGroup = async () => {
   if (groupForm.value.name) {
-    tagGroups.value.push({
-      id: tagGroups.value.length + 1,
-      name: groupForm.value.name,
-      tags: [...groupForm.value.tags]
-    })
-    showAddModal.value = false
-    groupForm.value = { name: '', tags: [] }
+    try {
+      const groupName = groupForm.value.name
+      const tagNames = groupForm.value.tags
+      await Promise.all(tagNames.map(name => createTag({ category: groupName, name })))
+      tagGroups.value.push({
+        id: tagGroups.value.length + 1,
+        name: groupName,
+        tags: [...tagNames]
+      })
+      showAddModal.value = false
+      groupForm.value = { name: '', tags: [] }
+    } catch (e) {
+      console.error('Failed to add group:', e)
+    }
   }
 }
 </script>

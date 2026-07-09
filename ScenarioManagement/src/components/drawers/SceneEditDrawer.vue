@@ -182,7 +182,7 @@ import { ref, computed, watch } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import TrackChanges from '@/components/common/TrackChanges.vue'
-import { approvalFlowData } from '@/data/mockData'
+import { getApprovalFlowBySceneId } from '@/api/approvalFlow'
 
 const props = defineProps({
   visible: {
@@ -202,6 +202,7 @@ const props = defineProps({
 const emit = defineEmits(['update:visible', 'close', 'save', 'view-data', 'approve'])
 
 const trackMode = ref(false)
+const sceneFlowData = ref(null)
 
 const sceneStatus = computed(() => {
   return props.sceneData?.status || ''
@@ -262,9 +263,8 @@ const fieldKeyMap = {
 }
 
 const getFieldChanges = (fieldKey) => {
-  if (!props.sceneData || !props.sceneData.id) return []
-  const flowData = approvalFlowData[props.sceneData.id]
-  if (!flowData) return []
+  if (!props.sceneData || !props.sceneData.id || !sceneFlowData.value) return []
+  const flowData = sceneFlowData.value
   const allChanges = []
   for (const step of flowData.steps) {
     if (step.modifications) {
@@ -385,6 +385,24 @@ watch(() => props.sceneData, (newData) => {
     editData.value = { ...defaultEditData }
   }
 }, { immediate: true, deep: true })
+
+watch(() => props.sceneData?.id, async (newId) => {
+  if (newId) {
+    try {
+      const response = await getApprovalFlowBySceneId(newId, 'scene')
+      const flowDataObj = JSON.parse(response.flowData || '{}')
+      sceneFlowData.value = {
+        flowType: response.flowType,
+        currentStep: response.currentStep,
+        steps: flowDataObj.steps || []
+      }
+    } catch (e) {
+      sceneFlowData.value = null
+    }
+  } else {
+    sceneFlowData.value = null
+  }
+}, { immediate: true })
 
 const addTag = () => {
   if (tagInput.value.trim() && !editData.value.tags.includes(tagInput.value.trim())) {

@@ -33,12 +33,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import ActionButton from '@/components/common/ActionButton.vue'
 import SceneDesignPage from '@/components/pages/SceneDesignPage.vue'
 import CaseDesignPage from '@/components/pages/CaseDesignPage.vue'
 import CreateScenarioDrawer from '@/components/drawers/CreateScenarioDrawer.vue'
-import { scenarioList } from '@/data/mockData'
+import { getSceneDesigns, createSceneDesign } from '@/api/sceneDesign'
 
 const showCreateModal = ref(false)
 const activeStep = ref('scenariocase')
@@ -48,19 +48,38 @@ const designSteps = [
   { id: 'testcase', title: '用例开发' }
 ]
 
-const scenarios = ref([...scenarioList])
+const scenarios = ref([])
+const loading = ref(false)
+
+const fetchData = async () => {
+  loading.value = true
+  try {
+    scenarios.value = await getSceneDesigns()
+  } catch(e) { console.error('Failed to load scenes:', e) }
+  finally { loading.value = false }
+}
+
+onMounted(fetchData)
 
 const handleDrawerClose = () => {}
 
-const handleCreate = (formData) => {
-  const newId = `SC${String(scenarios.value.length + 1).padStart(3, '0')}`
-  scenarios.value.unshift({
-    ...formData,
-    id: newId,
-    createTime: new Date().toISOString().split('T')[0],
-    status: '待审核',
-    stage: activeStep.value
-  })
+const handleCreate = async (formData) => {
+  try {
+    await createSceneDesign({
+      dcid: formData.caseId,
+      name: formData.name,
+      designer: formData.designer,
+      verifiers: formData.reviewers,
+      stage: activeStep.value,
+      status: '设计中',
+      modifyCount: 0,
+      createTime: new Date().toISOString().split('T')[0]
+    })
+    await fetchData()
+    ElMessage.success('场景创建成功')
+  } catch(e) {
+    ElMessage.error('创建失败: ' + e.message)
+  }
 }
 </script>
 

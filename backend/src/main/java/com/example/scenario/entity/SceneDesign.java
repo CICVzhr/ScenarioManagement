@@ -1,6 +1,7 @@
 package com.example.scenario.entity;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -30,10 +31,23 @@ public class SceneDesign {
     private Integer modifyCount;
 
     @Column(name = "create_time")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate createTime;
 
     @Column(name = "description", length = 1000)
     private String description;
+
+    @Column(name = "dcid", length = 20)
+    private String dcid;
+
+    @Column(name = "type", length = 50)
+    private String type;
+
+    @Column(name = "level", length = 20)
+    private String level;
+
+    @Column(name = "stage", length = 50)
+    private String stage;
 
     public SceneDesign() {}
 
@@ -55,4 +69,12 @@ public class SceneDesign {
     public void setCreateTime(LocalDate createTime) { this.createTime = createTime; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    public String getDcid() { return dcid; }
+    public void setDcid(String dcid) { this.dcid = dcid; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+    public String getLevel() { return level; }
+    public void setLevel(String level) { this.level = level; }
+    public String getStage() { return stage; }
+    public void setStage(String stage) { this.stage = stage; }
 } 

@@ -1,6 +1,6 @@
 package com.example.scenario.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "tag")

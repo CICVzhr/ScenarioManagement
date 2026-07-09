@@ -67,7 +67,6 @@ import CaseDetailDrawer from '@/components/drawers/CaseDetailDrawer.vue'
 import ApprovalFlowDrawer from '@/components/drawers/ApprovalFlowDrawer.vue'
 import { usePageFilter } from '@/composables/usePageFilter'
 import { useApprovalFlow } from '@/composables/useApprovalFlow'
-import { approvalFlowData as approvalFlowDataSource } from '@/data/mockData'
 
 const statusMap = {
   'pending': '设计中',
@@ -77,12 +76,12 @@ const statusMap = {
   'completed': '已完成'
 }
 
-const { searchKeyword, filterStatus, scenarios, filteredData } = usePageFilter({
+const { searchKeyword, filterStatus, scenarios, filteredData, fetchData } = usePageFilter({
   stage: 'scenariocase',
   statusMap
 })
 
-const { showApprovalDrawer, approvalScene, approvalFlowData, openApproval, closeApproval } = useApprovalFlow(approvalFlowDataSource)
+const { showApprovalDrawer, approvalScene, approvalFlowData, openApproval, closeApproval } = useApprovalFlow('scene')
 
 const showEditDrawer = ref(false)
 const showDetailDrawer = ref(false)
@@ -116,18 +115,12 @@ const handleDataDrawerClose = () => {
 }
 
 const handleEditSave = (data) => {
-  const index = scenarios.value.findIndex(item => item.id === data.id)
-  if (index !== -1) {
-    scenarios.value[index] = { ...scenarios.value[index], ...data }
-  }
+  fetchData()
   selectedScene.value = null
 }
 
 const handleApprove = (data) => {
-  const index = scenarios.value.findIndex(item => item.id === data.id)
-  if (index !== -1) {
-    scenarios.value[index] = { ...scenarios.value[index], ...data, status: '已完成' }
-  }
+  fetchData()
   selectedScene.value = null
   showEditDrawer.value = false
 }

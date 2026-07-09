@@ -37,7 +37,6 @@ import CaseDevelopmentTable from '@/components/tables/CaseDevelopmentTable.vue'
 import ApprovalFlowDrawer from '@/components/drawers/ApprovalFlowDrawer.vue'
 import { usePageFilter } from '@/composables/usePageFilter'
 import { useApprovalFlow } from '@/composables/useApprovalFlow'
-import { caseApprovalFlowData as caseApprovalFlowDataSource } from '@/data/mockData'
 
 const statusMap = {
   'pending': '开发中',
@@ -51,7 +50,7 @@ const { searchKeyword, filterStatus, filteredData } = usePageFilter({
   statusMap
 })
 
-const { showApprovalDrawer, approvalScene, approvalFlowData, openApproval, closeApproval } = useApprovalFlow(caseApprovalFlowDataSource)
+const { showApprovalDrawer, approvalScene, approvalFlowData, openApproval, closeApproval } = useApprovalFlow('case')
 
 const handleView = (row) => {}
 

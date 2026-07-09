@@ -36,7 +36,6 @@ import ScenarioValidationTable from '@/components/tables/ScenarioValidationTable
 import ApprovalFlowDrawer from '@/components/drawers/ApprovalFlowDrawer.vue'
 import { usePageFilter } from '@/composables/usePageFilter'
 import { useApprovalFlow } from '@/composables/useApprovalFlow'
-import { approvalFlowData as approvalFlowDataSource } from '@/data/mockData'
 
 const statusMap = {
   'pending': '待验证',
@@ -49,7 +48,7 @@ const { searchKeyword, filterStatus, filteredData } = usePageFilter({
   statusMap
 })
 
-const { showApprovalDrawer, approvalScene, approvalFlowData, openApproval, closeApproval } = useApprovalFlow(approvalFlowDataSource)
+const { showApprovalDrawer, approvalScene, approvalFlowData, openApproval, closeApproval } = useApprovalFlow('scene')
 
 const handleView = (row) => {}
 

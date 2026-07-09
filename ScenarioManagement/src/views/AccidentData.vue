@@ -179,14 +179,14 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import * as icons from '@element-plus/icons-vue'
 import SearchBar from '@/components/common/SearchBar.vue'
 import DataTable from '@/components/common/DataTable.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import ActionButton from '@/components/common/ActionButton.vue'
 import DetailDrawer from '@/components/common/DetailDrawer.vue'
-import { accidentDataList } from '@/data/mockData'
+import { getAccidentDataList, createAccidentData, deleteAccidentData, updateAccidentDataStatus } from '@/api/accidentData'
 
 const activeTab = ref('pool')
 const searchKeyword = ref('')
@@ -197,7 +197,17 @@ const showAddModal = ref(false)
 const showDetailDrawer = ref(false)
 const selectedRow = ref(null)
 
-const dataList = ref([...accidentDataList])
+const dataList = ref([])
+
+const fetchData = async () => {
+  try {
+    dataList.value = await getAccidentDataList()
+  } catch (e) {
+    console.error('Failed to load accident data:', e)
+  }
+}
+
+onMounted(fetchData)
 
 const reviewDataList = ref([
   {
@@ -303,7 +313,14 @@ const viewDetail = (row) => {
   showDetailDrawer.value = true
 }
 /*const editRow = (row) => console.log('编辑:', row)*/
-const deleteRow = (row) => console.log('删除:', row)
+const deleteRow = async (row) => {
+  try {
+    await deleteAccidentData(row.id)
+    await fetchData()
+  } catch (e) {
+    console.error('Failed to delete accident data:', e)
+  }
+}
 const handleDrawerClose = () => {
   showDetailDrawer.value = false
 }
@@ -311,14 +328,20 @@ const handleSaveDetail = (data) => {
   console.log('保存详情:', data)
 }
 
-const handleAdd = () => {
+const handleAdd = async () => {
   const newId = `DC${String(dataList.value.length + 1).padStart(3, '0')}`
-  dataList.value.unshift({
+  const formPayload = {
     ...formData.value,
     id: newId,
     reportTime: new Date().toISOString().split('T')[0],
     status: '待审核'
-  })
+  }
+  try {
+    await createAccidentData(formPayload)
+    await fetchData()
+  } catch (e) {
+    console.error('Failed to create accident data:', e)
+  }
   showAddModal.value = false
   formData.value = {
     name: '', reporter: '', reportTime: new Date().toISOString().split('T')[0],
@@ -327,13 +350,25 @@ const handleAdd = () => {
   }
 }
 
-const handleApprove = (row) => {
+const handleApprove = async (row) => {
   const item = reviewDataList.value.find(r => r.id === row.id)
   if (item) item.status = '已通过'
+  try {
+    await updateAccidentDataStatus(row.id, '已通过')
+    await fetchData()
+  } catch (e) {
+    console.error('Failed to approve accident data:', e)
+  }
 }
-const handleReject = (row) => {
+const handleReject = async (row) => {
   const item = reviewDataList.value.find(r => r.id === row.id)
   if (item) item.status = '已驳回'
+  try {
+    await updateAccidentDataStatus(row.id, '已驳回')
+    await fetchData()
+  } catch (e) {
+    console.error('Failed to reject accident data:', e)
+  }
 }
 const handleRelate = (row) => console.log('关联已有场景:', row)
 </script>

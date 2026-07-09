@@ -127,10 +127,10 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { Document, Location, Van, Connection } from '@element-plus/icons-vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
-import { scenarioList } from '@/data/mockData'
+import { getSceneDesigns } from '@/api/sceneDesign'
 
 const props = defineProps({
   visible: {
@@ -145,6 +145,14 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'close'])
 
+const allScenes = ref([])
+
+onMounted(() => {
+  getSceneDesigns().then(data => {
+    allScenes.value = data
+  })
+})
+
 const drawerVisible = computed({
   get: () => props.visible,
   set: (val) => emit('update:visible', val)
@@ -152,7 +160,7 @@ const drawerVisible = computed({
 
 const relatedScenes = computed(() => {
   if (!props.caseData || !props.caseData.id) return []
-  return scenarioList.filter(item => item.dcid === props.caseData.id)
+  return allScenes.value.filter(item => item.dcid === props.caseData.id)
 })
 
 const getLevelClass = (level) => {

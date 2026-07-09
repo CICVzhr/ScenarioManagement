@@ -1,6 +1,7 @@
 package com.example.scenario.entity;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,6 +22,7 @@ public class ProcessTask {
     private String submitter;
 
     @Column(name = "submit_time")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime submitTime;
 
     @Column(name = "status", length = 50)

@@ -110,35 +110,80 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import * as icons from '@element-plus/icons-vue'
-import { systemSettings } from '@/data/mockData'
+import { ElMessage } from 'element-plus'
+import { getDataSources, updateDataSourceStatus } from '@/api/dataSource'
+import { getSystemSetting, updateSystemSetting } from '@/api/systemSettings'
 
 const activeTab = ref('data-source')
 const showRoleModal = ref(false)
 
-const dataSources = ref([...systemSettings.dataSources])
-const roles = ref([...systemSettings.roles])
-const exportSettings = ref({ ...systemSettings.exportSettings })
+const dataSources = ref([])
+const roles = ref([])
+const exportSettings = ref({ wordExport: true, pdfExport: true, excelExport: true })
 
 const roleForm = ref({
   name: '',
   permissions: []
 })
 
-const toggleSource = (source) => {
-  source.status = source.status === '启用' ? '禁用' : '启用'
+const fetchDataSources = async () => {
+  try {
+    dataSources.value = await getDataSources()
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const fetchRoles = async () => {
+  try {
+    const value = await getSystemSetting('roles')
+    roles.value = JSON.parse(value)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const fetchExportSettings = async () => {
+  try {
+    const value = await getSystemSetting('exportSettings')
+    exportSettings.value = JSON.parse(value)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+onMounted(() => {
+  fetchDataSources()
+  fetchRoles()
+  fetchExportSettings()
+})
+
+const toggleSource = async (source) => {
+  const newStatus = source.status === '启用' ? '禁用' : '启用'
+  try {
+    await updateDataSourceStatus(source.id, newStatus)
+    source.status = newStatus
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 const editRole = (role) => {
   console.log('编辑角色:', role)
 }
 
-const deleteRole = (role) => {
-  console.log('删除角色:', role)
+const deleteRole = async (role) => {
+  try {
+    roles.value = roles.value.filter(r => r.id !== role.id)
+    await updateSystemSetting('roles', JSON.stringify(roles.value))
+  } catch (e) {
+    console.error(e)
+  }
 }
 
-const handleAddRole = () => {
+const handleAddRole = async () => {
   if (roleForm.value.name) {
     roles.value.push({
       id: roles.value.length + 1,
@@ -147,11 +192,21 @@ const handleAddRole = () => {
     })
     showRoleModal.value = false
     roleForm.value = { name: '', permissions: [] }
+    try {
+      await updateSystemSetting('roles', JSON.stringify(roles.value))
+    } catch (e) {
+      console.error(e)
+    }
   }
 }
 
-const saveExportSettings = () => {
-  console.log('保存导出设置:', exportSettings.value)
+const saveExportSettings = async () => {
+  try {
+    await updateSystemSetting('exportSettings', JSON.stringify(exportSettings.value))
+    ElMessage.success('保存成功')
+  } catch (e) {
+    console.error(e)
+  }
 }
 </script>
 

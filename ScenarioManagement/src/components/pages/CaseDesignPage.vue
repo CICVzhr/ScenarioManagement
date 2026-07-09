@@ -30,12 +30,12 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 import CaseDesignTable from '@/components/tables/CaseDesignTable.vue'
 import ApprovalFlowDrawer from '@/components/drawers/ApprovalFlowDrawer.vue'
 import { useApprovalFlow } from '@/composables/useApprovalFlow'
-import { scenarioList, caseApprovalFlowData as caseApprovalFlowDataSource } from '@/data/mockData'
+import { getSceneDesigns } from '@/api/sceneDesign'
 
 const sceneToCaseStatusMap = {
   '已完成': '开发中',
@@ -47,9 +47,10 @@ const sceneToCaseStatusMap = {
 
 const searchKeyword = ref('')
 const filterStatus = ref('')
+const sceneDesigns = ref([])
 
 const caseDesignList = computed(() => {
-  return scenarioList
+  return sceneDesigns.value
     .filter(item => item.stage === 'scenariocase')
     .map(item => ({
       ...item,
@@ -68,7 +69,13 @@ const filteredData = computed(() => {
   })
 })
 
-const { showApprovalDrawer, approvalScene, approvalFlowData, openApproval, closeApproval } = useApprovalFlow(caseApprovalFlowDataSource)
+onMounted(() => {
+  getSceneDesigns().then(data => {
+    sceneDesigns.value = data
+  })
+})
+
+const { showApprovalDrawer, approvalScene, approvalFlowData, openApproval, closeApproval } = useApprovalFlow('case')
 
 const handleView = (row) => {}
 

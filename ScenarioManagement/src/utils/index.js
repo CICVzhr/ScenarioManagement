@@ -45,3 +45,15 @@ export const getDevStatusClass = (status) => {
   }
   return statusMap[status] || 'status-developing'
 }
+
+/** Convert comma-separated tag string to array */
+export const parseTags = (tagStr) => {
+  if (!tagStr) return []
+  return String(tagStr).split(',').map(t => t.trim()).filter(Boolean)
+}
+
+/** Convert tag array to comma-separated string */
+export const formatTags = (tagArr) => {
+  if (!Array.isArray(tagArr)) return tagArr || ''
+  return tagArr.join(',')
+}

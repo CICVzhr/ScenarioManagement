@@ -1,6 +1,7 @@
 package com.example.scenario.entity;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -18,9 +19,11 @@ public class AccidentData {
     private String reporter;
 
     @Column(name = "report_time")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate reportTime;
 
     @Column(name = "occur_time")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate occurTime;
 
     @Column(name = "location", length = 200)
