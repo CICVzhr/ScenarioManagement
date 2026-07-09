@@ -15,7 +15,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Component
+// 已禁用数据初始化，直接从数据库读取已有数据
+// @Component
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired
@@ -70,23 +71,23 @@ public class DataInitializer implements CommandLineRunner {
         if (accidentDataRepository.count() == 0) {
             accidentDataRepository.saveAll(Arrays.asList(
                 createAccidentData("DC001", "雨天高速公路多车碰撞事故", "张晓明", "2023-09-10", "2023-09-09",
-                    "G15沈海高速", "高速公路", "大雨", "Model 3", "Autopilot", "事故", "重大", "待审核"),
+                    "G15沈海高速", "高速公路", "大雨", "Model 3", "Autopilot", "主机厂内部事故事件", "事故", "重大", "待审核"),
                 createAccidentData("DC002", "城市路口非机动车碰撞事故", "李思琪", "2023-09-08", "2023-09-07",
-                    "北京市朝阳区建国路", "城市道路", "晴天", "蔚来ES6", "NAD 2.0", "事故", "一般", "已通过"),
+                    "北京市朝阳区建国路", "城市道路", "晴天", "蔚来ES6", "NAD 2.0", "主机厂内部事故事件", "事故", "一般", "已通过"),
                 createAccidentData("DC003", "夜间隧道追尾事故", "王建国", "2023-09-06", "2023-09-05",
-                    "秦岭终南山隧道", "隧道", "阴天", "小鹏P7", "XPILOT 4.0", "事故", "较大", "待审核"),
+                    "秦岭终南山隧道", "隧道", "阴天", "小鹏P7", "XPILOT 4.0", "外部事故事件", "事故", "较大", "待审核"),
                 createAccidentData("DC004", "山区道路弯道超车事故", "赵海洋", "2023-09-04", "2023-09-03",
-                    "云南省丽江市山路", "山区道路", "小雨", "理想L9", "NOA 3.0", "事故", "重大", "已驳回"),
+                    "云南省丽江市山路", "山区道路", "小雨", "理想L9", "NOA 3.0", "其他", "事故", "重大", "已驳回"),
                 createAccidentData("DC005", "十字路口鬼探头场景", "孙东方", "2023-09-10", "2023-09-09",
-                    "G15沈海高速", "高速公路", "晴", "Model 3", "Autopilot", "事故", "重大", "设计完成")
+                    "G15沈海高速", "高速公路", "晴", "Model 3", "Autopilot", "主机厂内部事故事件", "事故", "重大", "设计完成")
             ));
         }
     }
 
     private AccidentData createAccidentData(String id, String name, String reporter, String reportTime,
                                             String occurTime, String location, String roadType, String weather,
-                                            String vehicleType, String systemVersion, String accidentType,
-                                            String accidentLevel, String status) {
+                                            String vehicleType, String systemVersion, String caseType,
+                                            String accidentType, String accidentLevel, String status) {
         AccidentData data = new AccidentData();
         data.setId(id);
         data.setName(name);
@@ -98,6 +99,7 @@ public class DataInitializer implements CommandLineRunner {
         data.setWeather(weather);
         data.setVehicleType(vehicleType);
         data.setSystemVersion(systemVersion);
+        data.setCaseType(caseType);
         data.setAccidentType(accidentType);
         data.setAccidentLevel(accidentLevel);
         data.setStatus(status);

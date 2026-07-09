@@ -25,6 +25,7 @@
             <el-table-column prop="name" label="案例标题" width="250" fixed="left" />
             <el-table-column prop="reporter" label="创建人" width="100" />
             <el-table-column prop="reportTime" label="创建时间" width="120" />
+            <el-table-column prop="caseType" label="案例类型" width="200" />
             <el-table-column prop="occurTime" label="发生时间" width="120" />
             <el-table-column prop="location" label="地点" width="150" />
             <el-table-column prop="roadType" label="道路描述" width="100" />
@@ -95,6 +96,7 @@
             <el-table-column prop="name" label="案例标题" min-width="200" />
             <el-table-column prop="reporter" label="创建人" width="100" />
             <el-table-column prop="reportTime" label="创建时间" width="120" />
+            <el-table-column prop="caseType" label="案例类型" width="200" />
             <el-table-column label="操作" width="320">
               <template #default="scope">
                 <div class="action-group">
@@ -147,6 +149,13 @@
         </el-form-item>
         <el-form-item label="系统版本">
           <el-input v-model="formData.systemVersion" placeholder="请输入系统版本" />
+        </el-form-item>
+        <el-form-item label="案例类型">
+          <el-select v-model="formData.caseType" placeholder="选择案例类型">
+            <el-option label="主机厂内部事故事件" value="主机厂内部事故事件" />
+            <el-option label="外部事故事件" value="外部事故事件" />
+            <el-option label="其他" value="其他" />
+          </el-select>
         </el-form-item>
         <el-form-item label="事故/事件">
           <el-select v-model="formData.accidentType">
@@ -215,6 +224,7 @@ const reviewDataList = ref([
     name: '雨天高速公路多车碰撞事故',
     reporter: '张晓明',
     reportTime: '2023-09-10',
+    caseType: '主机产内部事故事件',
     status: '待审核',
     auditData: {
       dataCompleteness: { type: 'success', text: '✓ 完整' },
@@ -274,6 +284,7 @@ const formData = ref({
   weather: '',
   vehicleType: '',
   systemVersion: '',
+  caseType: '',
   accidentType: '事故',
   accidentLevel: '一般'
 })
@@ -346,7 +357,7 @@ const handleAdd = async () => {
   formData.value = {
     name: '', reporter: '', reportTime: new Date().toISOString().split('T')[0],
     occurTime: '', location: '', roadType: '', weather: '',
-    vehicleType: '', systemVersion: '', accidentType: '事故', accidentLevel: '一般'
+    vehicleType: '', systemVersion: '', caseType: '', accidentType: '事故', accidentLevel: '一般'
   }
 }
 

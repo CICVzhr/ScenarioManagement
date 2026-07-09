@@ -50,6 +50,9 @@ public class AccidentData {
     @Column(name = "status", length = 50)
     private String status;
 
+    @Column(name = "case_type", length = 50)
+    private String caseType;
+
     public AccidentData() {}
 
     public String getId() { return id; }
@@ -78,4 +81,6 @@ public class AccidentData {
     public void setAccidentLevel(String accidentLevel) { this.accidentLevel = accidentLevel; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getCaseType() { return caseType; }
+    public void setCaseType(String caseType) { this.caseType = caseType; }
 }

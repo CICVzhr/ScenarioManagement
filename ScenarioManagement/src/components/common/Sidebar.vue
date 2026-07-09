@@ -9,16 +9,10 @@
         <span class="menu-icon">{{ item.icon }}</span>
         <span>{{ item.name }}</span>
       </el-menu-item>
-      <el-sub-menu index="scene-data">
-        <template #title>
-          <span class="menu-icon">📁</span>
-          <span>场景数据</span>
-          <el-icon class="arrow-icon"></el-icon>
-        </template>
-        <el-menu-item v-for="item in sceneDataItems" :key="item.path" :index="item.path">
-          {{ item.name }}
-        </el-menu-item>
-      </el-sub-menu>
+      <el-menu-item index="/accident-data">
+        <span class="menu-icon">📁</span>
+        <span>场景数据</span>
+      </el-menu-item>      
       <el-sub-menu index="scene-library">
         <template #title>
           <span class="menu-icon">🎨</span>
@@ -29,6 +23,7 @@
           {{ item.name }}
         </el-menu-item>
       </el-sub-menu>
+
       <el-menu-item index="/tag-management">
         <template #title>
           <span class="menu-icon">🏷️</span>
@@ -69,13 +64,7 @@ const mainMenuItems = [
   // { id: 'statistics', name: '统计分析', path: '/statistics', icon: '📈' }
 ]
 
-const sceneDataItems = [
-  { id: 'accident-data', name: '主机厂内部事故事件', path: '/accident-data' },
-  { id: 'dept-data', name: '部委监管数据', path: '/dept-data' },
-  { id: 'research-data', name: '深度调查机构数据', path: '/research-data' },
-  { id: 'judicial-data', name: '司法鉴定机构数据', path: '/judicial-data' },
-  { id: 'police-data', name: '智驾事故研判数据', path: '/police-data' }
-]
+// 场景数据改为顶级菜单项，不再展开子菜单
 
 const sceneLibraryItems = [
   { id: 'scenario-design', name: '场景与用例设计', path: '/scenario-design' },

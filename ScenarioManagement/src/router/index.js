@@ -10,31 +10,7 @@ const routes = [
   {
     path: '/accident-data',
     name: 'AccidentData',
-    meta: { title: '主机厂内部事故事件' },
-    component: () => import('@/views/AccidentData.vue')
-  },
-  {
-    path: '/dept-data',
-    name: 'DeptData',
-    meta: { title: '部委监管数据' },
-    component: () => import('@/views/AccidentData.vue')
-  },
-  {
-    path: '/research-data',
-    name: 'ResearchData',
-    meta: { title: '深度调查机构数据' },
-    component: () => import('@/views/AccidentData.vue')
-  },
-  {
-    path: '/judicial-data',
-    name: 'JudicialData',
-    meta: { title: '司法鉴定机构数据' },
-    component: () => import('@/views/AccidentData.vue')
-  },
-  {
-    path: '/police-data',
-    name: 'PoliceData',
-    meta: { title: '智驾事故研判数据' },
+    meta: { title: '场景数据' },
     component: () => import('@/views/AccidentData.vue')
   },
   {
