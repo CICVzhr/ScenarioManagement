@@ -195,7 +195,7 @@ import DataTable from '@/components/common/DataTable.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import ActionButton from '@/components/common/ActionButton.vue'
 import DetailDrawer from '@/components/common/DetailDrawer.vue'
-import { getAccidentDataList, createAccidentData, deleteAccidentData, updateAccidentDataStatus } from '@/api/accidentData'
+import { getAccidentDataList, createAccidentData, updateAccidentData, deleteAccidentData, updateAccidentDataStatus } from '@/api/accidentData'
 
 const activeTab = ref('pool')
 const searchKeyword = ref('')
@@ -218,61 +218,17 @@ const fetchData = async () => {
 
 onMounted(fetchData)
 
-const reviewDataList = ref([
-  {
-    id: 'DC001',
-    name: '雨天高速公路多车碰撞事故',
-    reporter: '张晓明',
-    reportTime: '2023-09-10',
-    caseType: '主机产内部事故事件',
-    status: '待审核',
+const reviewDataList = computed(() => {
+  return dataList.value.map(item => ({
+    ...item,
     auditData: {
       dataCompleteness: { type: 'success', text: '✓ 完整' },
       sceneValue: { type: 'success', text: '✓ 元素为诱因' },
       feasibility: { type: 'warning', text: '⚠ 建议简化' },
-      duplicateCheck: { type: 'info', text: '关联场景：SC001, SC003' }
+      duplicateCheck: { type: 'info', text: '关联场景：SC001' }
     }
-  },
-  {
-    id: 'DC002',
-    name: '城市路口非机动车碰撞事故',
-    reporter: '李思琪',
-    reportTime: '2023-09-08',
-    status: '已通过',
-    auditData: {
-      dataCompleteness: { type: 'success', text: '✓ 完整' },
-      sceneValue: { type: 'success', text: '✓ 元素为诱因' },
-      feasibility: { type: 'success', text: '✓ 可行' },
-      duplicateCheck: { type: 'info', text: '关联场景：SC002' }
-    }
-  },
-  {
-    id: 'DC003',
-    name: '夜间隧道追尾事故',
-    reporter: '王建国',
-    reportTime: '2023-09-06',
-    status: '待审核',
-    auditData: {
-      dataCompleteness: { type: 'warning', text: '⚠ 缺少过程描述' },
-      sceneValue: { type: 'success', text: '✓ 元素为诱因' },
-      feasibility: { type: 'success', text: '✓ 可行' },
-      duplicateCheck: { type: 'success', text: '✓ 无重复' }
-    }
-  },
-  {
-    id: 'DC004',
-    name: '山区道路弯道超车事故',
-    reporter: '赵海洋',
-    reportTime: '2023-09-04',
-    status: '已驳回',
-    auditData: {
-      dataCompleteness: { type: 'success', text: '✓ 完整' },
-      sceneValue: { type: 'warning', text: '⚠ 元素非主要诱因' },
-      feasibility: { type: 'warning', text: '⚠ 建议简化' },
-      duplicateCheck: { type: 'info', text: '关联场景：SC004' }
-    }
-  }
-])
+  }))
+})
 
 const formData = ref({
   name: '',
@@ -335,12 +291,33 @@ const deleteRow = async (row) => {
 const handleDrawerClose = () => {
   showDetailDrawer.value = false
 }
-const handleSaveDetail = (data) => {
-  console.log('保存详情:', data)
+const handleSaveDetail = async (drawerData) => {
+  try {
+    const payload = {
+      id: drawerData.id,
+      name: drawerData.title || '',
+      reporter: drawerData.creator || '',
+      reportTime: drawerData.createTime || null,
+      occurTime: drawerData.occurTime || null,
+      location: drawerData.location || '',
+      roadType: drawerData.roadDescription || '',
+      weather: drawerData.weatherCondition || '',
+      vehicleType: drawerData.vehicleType || '',
+      systemVersion: drawerData.adaptiveFunction || '',
+      caseType: drawerData.caseType || '',
+      accidentType: drawerData.accidentType || '',
+      accidentLevel: drawerData.level || '',
+      status: selectedRow.value?.status || ''
+    }
+    await updateAccidentData(drawerData.id, payload)
+    await fetchData()
+  } catch (e) {
+    console.error('Failed to save detail:', e)
+  }
 }
 
 const handleAdd = async () => {
-  const newId = `DC${String(dataList.value.length + 1).padStart(3, '0')}`
+  const newId = `DC${Date.now().toString(36).toUpperCase()}`
   const formPayload = {
     ...formData.value,
     id: newId,
@@ -362,8 +339,6 @@ const handleAdd = async () => {
 }
 
 const handleApprove = async (row) => {
-  const item = reviewDataList.value.find(r => r.id === row.id)
-  if (item) item.status = '已通过'
   try {
     await updateAccidentDataStatus(row.id, '已通过')
     await fetchData()
@@ -372,8 +347,6 @@ const handleApprove = async (row) => {
   }
 }
 const handleReject = async (row) => {
-  const item = reviewDataList.value.find(r => r.id === row.id)
-  if (item) item.status = '已驳回'
   try {
     await updateAccidentDataStatus(row.id, '已驳回')
     await fetchData()

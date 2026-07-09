@@ -1,4 +1,4 @@
-﻿﻿<template>
+﻿﻿﻿﻿﻿﻿﻿<template>
   <el-drawer
     title="案例详情"
     :model-value="visible"
@@ -36,6 +36,11 @@
           <span class="detail-label">事故/事件地点</span>
           <el-input v-if="isEditing" v-model="data.location" placeholder="请输入地点" />
           <span v-else class="detail-value">{{ data.location || '-' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">案例类型</span>
+          <el-input v-if="isEditing" v-model="data.caseType" placeholder="请输入案例类型" />
+          <span v-else class="detail-value">{{ data.caseType || '-' }}</span>
         </div>
         <div class="detail-row">
           <span class="detail-label">案例标题</span>
@@ -171,6 +176,7 @@ const props = defineProps({
 const emit = defineEmits(['update:visible', 'close', 'save'])
 
 const defaultData = {
+  id: '',
   creator: '',
   createTime: '',
   occurTime: '',
@@ -185,6 +191,7 @@ const defaultData = {
   processDescription: '',
   causeInitialJudgment: '',
   accidentType: '',
+  caseType: '',
   causeTag: '',
   level: '',
   mediaLink: '',
@@ -198,6 +205,7 @@ const backupData = ref(null)
 watch(() => props.rowData, (newData) => {
   if (newData) {
     data.value = {
+      id: newData.id || '',
       creator: newData.reporter || '',
       createTime: newData.reportTime || '',
       occurTime: newData.occurTime || '',
@@ -212,6 +220,7 @@ watch(() => props.rowData, (newData) => {
       processDescription: '',
       causeInitialJudgment: '',
       accidentType: newData.accidentType || '',
+      caseType: newData.caseType || '',
       causeTag: '',
       level: newData.accidentLevel || '',
       mediaLink: '',

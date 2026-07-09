@@ -35,8 +35,8 @@ public class AccidentDataController {
 
     @PutMapping("/{id}")
     public ResponseEntity<AccidentData> updateAccidentData(@PathVariable String id, @RequestBody AccidentData accidentData) {
-        if (!accidentData.getId().equals(id)) {
-            return ResponseEntity.badRequest().build();
+        if (accidentData.getId() == null || !accidentData.getId().equals(id)) {
+            accidentData.setId(id);
         }
         return ResponseEntity.ok(accidentDataService.saveAccidentData(accidentData));
     }

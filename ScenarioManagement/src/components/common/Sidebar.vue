@@ -25,11 +25,8 @@
       </el-sub-menu>
 
       <el-menu-item index="/tag-management">
-        <template #title>
-          <span class="menu-icon">🏷️</span>
-          <span>标签管理</span>
-          <el-icon class="arrow-icon"></el-icon>
-        </template>        
+        <span class="menu-icon">🏷️</span>
+        <span>标签管理</span>
       </el-menu-item>
       <el-menu-item index="/system-settings">
         <span class="menu-icon">⚙️</span>
