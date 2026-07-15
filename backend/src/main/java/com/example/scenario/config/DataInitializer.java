@@ -8,15 +8,12 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 // 已禁用数据初始化，直接从数据库读取已有数据
-// @Component
+@Component
 public class DataInitializer implements CommandLineRunner {
 
     @Autowired
@@ -49,10 +46,29 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired
     private SystemSettingRepository systemSettingRepository;
 
+    @Autowired
+    private SysUserRepository sysUserRepository;
+
+    @Autowired
+    private SysRoleRepository sysRoleRepository;
+
+    @Autowired
+    private SysPermissionRepository sysPermissionRepository;
+
+    @Autowired
+    private SysUserRoleRepository sysUserRoleRepository;
+
+    @Autowired
+    private SysRolePermissionRepository sysRolePermissionRepository;
+
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void run(String... args) {
+        initUsersAndRoles();
         initAccidentData();
         initSceneDesign();
         initDangerScene();
@@ -65,7 +81,98 @@ public class DataInitializer implements CommandLineRunner {
         initSystemSettings();
     }
 
-    // ==================== AccidentData ====================
+    // ==================== Users & Roles & Permissions ====================
+
+    private void initUsersAndRoles() {
+        // Permissions
+        if (sysPermissionRepository.count() == 0) {
+            SysPermission p1 = new SysPermission(); p1.setPermissionCode("dashboard"); p1.setPermissionName("仪表盘"); p1.setParentId(0L); p1.setPermissionType("menu"); p1.setPath("/dashboard"); p1.setSortOrder(1); p1.setStatus(1); sysPermissionRepository.save(p1);
+            SysPermission p2 = new SysPermission(); p2.setPermissionCode("accident"); p2.setPermissionName("事故数据管理"); p2.setParentId(0L); p2.setPermissionType("menu"); p2.setPath("/accident"); p2.setSortOrder(2); p2.setStatus(1); sysPermissionRepository.save(p2);
+            SysPermission p3 = new SysPermission(); p3.setPermissionCode("accident:view"); p3.setPermissionName("查看"); p3.setParentId(p2.getId()); p3.setPermissionType("button"); p3.setSortOrder(1); p3.setStatus(1); sysPermissionRepository.save(p3);
+            SysPermission p4 = new SysPermission(); p4.setPermissionCode("accident:edit"); p4.setPermissionName("编辑"); p4.setParentId(p2.getId()); p4.setPermissionType("button"); p4.setSortOrder(2); p4.setStatus(1); sysPermissionRepository.save(p4);
+            SysPermission p5 = new SysPermission(); p5.setPermissionCode("accident:delete"); p5.setPermissionName("删除"); p5.setParentId(p2.getId()); p5.setPermissionType("button"); p5.setSortOrder(3); p5.setStatus(1); sysPermissionRepository.save(p5);
+            SysPermission p6 = new SysPermission(); p6.setPermissionCode("scene"); p6.setPermissionName("场景设计"); p6.setParentId(0L); p6.setPermissionType("menu"); p6.setPath("/scene"); p6.setSortOrder(3); p6.setStatus(1); sysPermissionRepository.save(p6);
+            SysPermission p7 = new SysPermission(); p7.setPermissionCode("scene:view"); p7.setPermissionName("查看"); p7.setParentId(p6.getId()); p7.setPermissionType("button"); p7.setSortOrder(1); p7.setStatus(1); sysPermissionRepository.save(p7);
+            SysPermission p8 = new SysPermission(); p8.setPermissionCode("scene:edit"); p8.setPermissionName("编辑"); p8.setParentId(p6.getId()); p8.setPermissionType("button"); p8.setSortOrder(2); p8.setStatus(1); sysPermissionRepository.save(p8);
+            SysPermission p9 = new SysPermission(); p9.setPermissionCode("scene:approve"); p9.setPermissionName("审核"); p9.setParentId(p6.getId()); p9.setPermissionType("button"); p9.setSortOrder(3); p9.setStatus(1); sysPermissionRepository.save(p9);
+            SysPermission p10 = new SysPermission(); p10.setPermissionCode("danger"); p10.setPermissionName("危险场景库"); p10.setParentId(0L); p10.setPermissionType("menu"); p10.setPath("/danger"); p10.setSortOrder(4); p10.setStatus(1); sysPermissionRepository.save(p10);
+            SysPermission p11 = new SysPermission(); p11.setPermissionCode("case"); p11.setPermissionName("用例设计"); p11.setParentId(0L); p11.setPermissionType("menu"); p11.setPath("/case"); p11.setSortOrder(5); p11.setStatus(1); sysPermissionRepository.save(p11);
+            SysPermission p12 = new SysPermission(); p12.setPermissionCode("test"); p12.setPermissionName("用例管理"); p12.setParentId(0L); p12.setPermissionType("menu"); p12.setPath("/test"); p12.setSortOrder(6); p12.setStatus(1); sysPermissionRepository.save(p12);
+            SysPermission p13 = new SysPermission(); p13.setPermissionCode("evaluation"); p13.setPermissionName("测试评价"); p13.setParentId(0L); p13.setPermissionType("menu"); p13.setPath("/evaluation"); p13.setSortOrder(7); p13.setStatus(1); sysPermissionRepository.save(p13);
+            SysPermission p14 = new SysPermission(); p14.setPermissionCode("statistics"); p14.setPermissionName("数据统计"); p14.setParentId(0L); p14.setPermissionType("menu"); p14.setPath("/statistics"); p14.setSortOrder(8); p14.setStatus(1); sysPermissionRepository.save(p14);
+            SysPermission p15 = new SysPermission(); p15.setPermissionCode("settings"); p15.setPermissionName("系统设置"); p15.setParentId(0L); p15.setPermissionType("menu"); p15.setPath("/settings"); p15.setSortOrder(9); p15.setStatus(1); sysPermissionRepository.save(p15);
+            SysPermission p16 = new SysPermission(); p16.setPermissionCode("system:user"); p16.setPermissionName("用户管理"); p16.setParentId(0L); p16.setPermissionType("menu"); p16.setPath("/system/user"); p16.setSortOrder(10); p16.setStatus(1); sysPermissionRepository.save(p16);
+            SysPermission p17 = new SysPermission(); p17.setPermissionCode("system:role"); p17.setPermissionName("角色管理"); p17.setParentId(0L); p17.setPermissionType("menu"); p17.setPath("/system/role"); p17.setSortOrder(11); p17.setStatus(1); sysPermissionRepository.save(p17);
+            SysPermission p18 = new SysPermission(); p18.setPermissionCode("system:permission"); p18.setPermissionName("权限管理"); p18.setParentId(0L); p18.setPermissionType("menu"); p18.setPath("/system/permission"); p18.setSortOrder(12); p18.setStatus(1); sysPermissionRepository.save(p18);
+        }
+
+        // Roles
+        // Always ensure roles exist
+        if (sysRoleRepository.count() == 0) {
+            SysRole adminRole = new SysRole(); adminRole.setRoleName("管理员"); adminRole.setRoleCode("admin"); adminRole.setDescription("系统管理员"); adminRole.setStatus(1); sysRoleRepository.save(adminRole);
+            SysRole designerRole = new SysRole(); designerRole.setRoleName("设计人员"); designerRole.setRoleCode("designer"); designerRole.setDescription("场景设计人员"); designerRole.setStatus(1); sysRoleRepository.save(designerRole);
+            SysRole reviewerRole = new SysRole(); reviewerRole.setRoleName("审核人员"); reviewerRole.setRoleCode("reviewer"); reviewerRole.setDescription("审核人员"); reviewerRole.setStatus(1); sysRoleRepository.save(reviewerRole);
+
+            // Admin has all permissions
+            List<SysPermission> allPerms = sysPermissionRepository.findAll();
+            for (SysPermission perm : allPerms) {
+                SysRolePermission rp = new SysRolePermission(); rp.setRoleId(adminRole.getId()); rp.setPermissionId(perm.getId());
+                if (!sysRolePermissionRepository.existsByRoleIdAndPermissionId(adminRole.getId(), perm.getId())) {
+                    sysRolePermissionRepository.save(rp);
+                }
+            }
+
+            // Designer permissions
+            String[] designerCodes = {"accident", "accident:view", "scene", "scene:view", "scene:edit", "danger", "case", "test"};
+            for (String code : designerCodes) {
+                sysPermissionRepository.findByPermissionCode(code).ifPresent(perm -> {
+                    if (!sysRolePermissionRepository.existsByRoleIdAndPermissionId(designerRole.getId(), perm.getId())) {
+                        SysRolePermission rp = new SysRolePermission(); rp.setRoleId(designerRole.getId()); rp.setPermissionId(perm.getId()); sysRolePermissionRepository.save(rp);
+                    }
+                });
+            }
+
+            // Reviewer permissions
+            String[] reviewerCodes = {"accident", "accident:view", "scene", "scene:view", "scene:approve", "danger", "case", "test"};
+            for (String code : reviewerCodes) {
+                sysPermissionRepository.findByPermissionCode(code).ifPresent(perm -> {
+                    if (!sysRolePermissionRepository.existsByRoleIdAndPermissionId(reviewerRole.getId(), perm.getId())) {
+                        SysRolePermission rp = new SysRolePermission(); rp.setRoleId(reviewerRole.getId()); rp.setPermissionId(perm.getId()); sysRolePermissionRepository.save(rp);
+                    }
+                });
+            }
+        }
+
+        // Users
+        // Always ensure admin user exists with correct password
+        SysUser adminUser = sysUserRepository.findByUsername("admin").orElse(null);
+        if (adminUser == null) {
+            adminUser = new SysUser();
+            adminUser.setUsername("admin");
+            adminUser.setRealName("系统管理员");
+            adminUser.setStatus(1);
+        }
+        adminUser.setPassword(passwordEncoder.encode("admin123"));
+        adminUser = sysUserRepository.save(adminUser);
+
+        // Ensure admin has admin role
+        SysRole adminRole = sysRoleRepository.findByRoleCode("admin").orElse(null);
+        if (adminRole != null && !sysUserRoleRepository.existsByUserIdAndRoleId(adminUser.getId(), adminRole.getId())) {
+            SysUserRole ur = new SysUserRole(); ur.setUserId(adminUser.getId()); ur.setRoleId(adminRole.getId()); sysUserRoleRepository.save(ur);
+        }
+
+        if (sysUserRepository.count() <= 1) {
+            SysUser designer = new SysUser(); designer.setUsername("designer"); designer.setPassword(passwordEncoder.encode("123456")); designer.setRealName("设计人员"); designer.setStatus(1); sysUserRepository.save(designer);
+            SysUser reviewer = new SysUser(); reviewer.setUsername("reviewer"); reviewer.setPassword(passwordEncoder.encode("123456")); reviewer.setRealName("审核人员"); reviewer.setStatus(1); sysUserRepository.save(reviewer);
+
+            SysRole designerRole = sysRoleRepository.findByRoleCode("designer").orElse(null);
+            SysRole reviewerRole = sysRoleRepository.findByRoleCode("reviewer").orElse(null);
+
+            if (adminRole != null && !sysUserRoleRepository.existsByUserIdAndRoleId(adminUser.getId(), adminRole.getId())) { SysUserRole ur = new SysUserRole(); ur.setUserId(adminUser.getId()); ur.setRoleId(adminRole.getId()); sysUserRoleRepository.save(ur); }
+            if (designerRole != null) { SysUserRole ur = new SysUserRole(); ur.setUserId(designer.getId()); ur.setRoleId(designerRole.getId()); sysUserRoleRepository.save(ur); }
+            if (reviewerRole != null) { SysUserRole ur = new SysUserRole(); ur.setUserId(reviewer.getId()); ur.setRoleId(reviewerRole.getId()); sysUserRoleRepository.save(ur); }
+        }
+    }
 
     private void initAccidentData() {
         if (accidentDataRepository.count() == 0) {

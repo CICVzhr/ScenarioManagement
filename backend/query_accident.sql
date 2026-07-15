@@ -1,0 +1,1 @@
+SELECT id, name, reporter, report_time, occur_time, location, road_type, weather, vehicle_type, system_version, accident_type, accident_level, case_type, status FROM accident_data;

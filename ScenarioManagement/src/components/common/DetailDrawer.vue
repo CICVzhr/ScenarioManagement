@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿<template>
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<template>
   <el-drawer
     title="案例详情"
     :model-value="visible"
@@ -157,6 +157,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { getAccidentDataDetail, saveAccidentDataDetail } from '@/api/accidentDataDetail'
 
 const props = defineProps({
   visible: {
@@ -202,29 +203,13 @@ const data = ref({ ...defaultData })
 const isEditing = ref(false)
 const backupData = ref(null)
 
-watch(() => props.rowData, (newData) => {
-  if (newData) {
-    data.value = {
-      id: newData.id || '',
-      creator: newData.reporter || '',
-      createTime: newData.reportTime || '',
-      occurTime: newData.occurTime || '',
-      location: newData.location || '',
-      title: newData.name || '',
-      roadDescription: newData.roadType || '',
-      lightingCondition: '',
-      weatherCondition: newData.weather || '',
-      perceptionScheme: '',
-      vehicleType: newData.vehicleType || '',
-      adaptiveFunction: '',
-      processDescription: '',
-      causeInitialJudgment: '',
-      accidentType: newData.accidentType || '',
-      caseType: newData.caseType || '',
-      causeTag: '',
-      level: newData.accidentLevel || '',
-      mediaLink: '',
-      mediaFile: ''
+watch(() => props.rowData, async (newData) => {
+  if (newData && newData.id) {
+    try {
+      const detail = await getAccidentDataDetail(newData.id)
+      data.value = { ...defaultData, ...detail }
+    } catch {
+      data.value = { ...defaultData }
     }
   }
 }, { immediate: true })
@@ -253,9 +238,14 @@ const handleCancel = () => {
   isEditing.value = false
 }
 
-const handleSave = () => {
+const handleSave = async () => {
   isEditing.value = false
   backupData.value = null
+  try {
+    await saveAccidentDataDetail(data.value.id, data.value)
+  } catch (e) {
+    console.error('Failed to save detail:', e)
+  }
   emit('save', { ...data.value })
   emit('update:visible', false)
 }

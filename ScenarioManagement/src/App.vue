@@ -1,6 +1,7 @@
 <template>
   <div class="app-container">
-    <el-container>
+    <router-view v-if="isLoginPage" />
+    <el-container v-else>
       <Sidebar ref="sidebarRef" />
       <el-container class="main-container">
         <Header @toggle-sidebar="toggleSidebar" />
@@ -17,11 +18,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import Sidebar from '@/components/common/Sidebar.vue'
 import Header from '@/components/common/Header.vue'
 
+const route = useRoute()
 const sidebarRef = ref(null)
+
+const isLoginPage = computed(() => route.path === '/login')
 
 const toggleSidebar = () => {
   sidebarRef.value?.toggle()

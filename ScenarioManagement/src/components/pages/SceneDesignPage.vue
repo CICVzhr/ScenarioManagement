@@ -1,4 +1,4 @@
-<template>
+meici<template>
   <div class="page-container">
     <div class="page-toolbar">
       <el-input v-model="searchKeyword" placeholder="搜索场景..." class="search-input">
@@ -25,12 +25,10 @@
     <SceneEditDrawer
       :visible="showEditDrawer"
       :scene-data="selectedScene"
-      :data-drawer-visible="showDataDrawer"
       @update:visible="showEditDrawer = $event"
       @close="handleEditClose"
       @save="handleEditSave"
       @approve="handleApprove"
-      @view-data="handleViewData"
     />
 
     <SceneDetailDrawer
@@ -38,13 +36,6 @@
       :scene-data="detailScene"
       @update:visible="showDetailDrawer = $event"
       @close="handleDetailClose"
-    />
-
-    <CaseDetailDrawer
-      :visible="showDataDrawer"
-      :case-data="dataDrawerRow"
-      @update:visible="showDataDrawer = $event"
-      @close="handleDataDrawerClose"
     />
 
     <ApprovalFlowDrawer
@@ -63,7 +54,6 @@ import { Search } from '@element-plus/icons-vue'
 import ScenarioDesignTable from '@/components/tables/ScenarioDesignTable.vue'
 import SceneEditDrawer from '@/components/drawers/SceneEditDrawer.vue'
 import SceneDetailDrawer from '@/components/drawers/SceneDetailDrawer.vue'
-import CaseDetailDrawer from '@/components/drawers/CaseDetailDrawer.vue'
 import ApprovalFlowDrawer from '@/components/drawers/ApprovalFlowDrawer.vue'
 import { usePageFilter } from '@/composables/usePageFilter'
 import { useApprovalFlow } from '@/composables/useApprovalFlow'
@@ -85,15 +75,11 @@ const { showApprovalDrawer, approvalScene, approvalFlowData, openApproval, close
 
 const showEditDrawer = ref(false)
 const showDetailDrawer = ref(false)
-const showDataDrawer = ref(false)
 const selectedScene = ref(null)
 const detailScene = ref(null)
-const dataDrawerRow = ref(null)
 
 const handleEdit = (row) => {
   selectedScene.value = row
-  showDataDrawer.value = false
-  dataDrawerRow.value = null
   showEditDrawer.value = true
 }
 
@@ -103,15 +89,6 @@ const handleEditClose = () => {
 
 const handleDetailClose = () => {
   detailScene.value = null
-}
-
-const handleViewData = (data) => {
-  dataDrawerRow.value = data
-  showDataDrawer.value = true
-}
-
-const handleDataDrawerClose = () => {
-  dataDrawerRow.value = null
 }
 
 const handleEditSave = (data) => {

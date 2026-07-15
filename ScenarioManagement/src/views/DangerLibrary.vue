@@ -22,12 +22,22 @@
         <el-option label="障碍物避让" value="障碍物避让" />
         <el-option label="超车" value="超车" />
       </el-select>
+      <el-select v-model="statusFilter" placeholder="全部状态" class="status-select">
+        <el-option label="全部状态" value="" />
+        <el-option label="用例开发" value="用例开发" />
+        <el-option label="已完成" value="已完成" />
+      </el-select>
     </div>
 
     <el-table :data="filteredScenes" class="scene-table" border>
       <el-table-column prop="version" label="版本" width="80" />
       <el-table-column prop="id" label="场景ID" width="100" />
       <el-table-column prop="name" label="场景名称" min-width="200" />
+      <el-table-column prop="status" label="状态" width="120">
+        <template #default="scope">
+          <span :class="['status-badge', getStatusClass(scope.row.status)]">{{ scope.row.status }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="标签" min-width="200">
         <template #default="scope">
           <span v-for="(tag, index) in scope.row.tags" :key="index" class="tag">{{ tag }}</span>
@@ -39,7 +49,6 @@
           <el-button type="primary" link @click="viewScene(scope.row)">查看</el-button>
           <el-button type="primary" link @click="exportWord(scope.row)">导出Word</el-button>
           <el-button type="primary" link @click="exportPdf(scope.row)">导出PDF</el-button>
-          <el-button type="primary" link @click="exportPdf(scope.row)">退回设计</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -66,7 +75,7 @@ const sceneList = ref([])
 onMounted(async () => {
   try {
     const res = await getDangerScenes()
-    sceneList.value = (res.data || []).map(item => ({
+    sceneList.value = (Array.isArray(res) ? res : []).map(item => ({
       ...item,
       tags: parseTags(item.tags)
     }))
@@ -76,6 +85,7 @@ onMounted(async () => {
 })
 const searchKeyword = ref('')
 const categoryFilter = ref('')
+const statusFilter = ref('')
 const showDetailModal = ref(false)
 const selectedScene = ref(null)
 
@@ -85,9 +95,14 @@ const filteredScenes = computed(() => {
       item.name.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
       item.id.toLowerCase().includes(searchKeyword.value.toLowerCase())
     const matchCategory = !categoryFilter.value || item.tags.includes(categoryFilter.value)
-    return matchKeyword && matchCategory
+    const matchStatus = !statusFilter.value || item.status === statusFilter.value
+    return matchKeyword && matchCategory && matchStatus
   })
 })
+
+const getStatusClass = (status) => {
+  return `status-${status}`.replace(/\s+/g, '-')
+}
 
 const viewScene = (scene) => {
   selectedScene.value = scene
@@ -164,6 +179,10 @@ const handleExport = (scene) => {
   .category-select {
     width: 160px;
   }
+
+  .status-select {
+    width: 140px;
+  }
 }
 
 .scene-table {
@@ -185,6 +204,22 @@ const handleExport = (scene) => {
       border-radius: 16px;
       font-size: 12px;
       margin-right: 6px;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+
+      &.status-用例开发 {
+        background: #FEF3C7;
+        color: #D97706;
+      }
+
+      &.status-已完成 {
+        background: #D1FAE5;
+        color: #059669;
+      }
     }
   }
 }

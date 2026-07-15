@@ -13,9 +13,9 @@
     </div>
     <div class="header-right">
       <el-button class="header-btn"><el-icon><component :is="icons.Bell" /></el-icon></el-button>
-      <el-button class="header-btn"><el-icon><component :is="icons.Setting" /></el-icon></el-button>
-      <div class="divider"></div>
-      <el-button class="header-btn"><el-icon><component :is="icons.User" /></el-icon></el-button>
+      <el-button class="header-btn" @click="handleLogout" title="退出登录">
+        <el-icon><component :is="icons.SwitchButton" /></el-icon>
+      </el-button>
     </div>
   </el-header>
 </template>
@@ -25,9 +25,11 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useRouter } from 'vue-router'
 import * as icons from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/userStore'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 
 const breadcrumbs = computed(() => {
   const matched = route.matched
@@ -39,6 +41,11 @@ const breadcrumbs = computed(() => {
 
 const navigateTo = (path) => {
   router.push(path)
+}
+
+const handleLogout = () => {
+  userStore.logout()
+  router.push('/login')
 }
 
 defineEmits(['toggleSidebar'])

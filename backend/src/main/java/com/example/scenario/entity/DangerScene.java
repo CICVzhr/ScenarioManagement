@@ -37,6 +37,9 @@ public class DangerScene {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate storageTime;
 
+    @Column(name = "status", length = 50)
+    private String status;
+
     public DangerScene() {}
 
     public String getId() { return id; }
@@ -57,4 +60,6 @@ public class DangerScene {
     public void setCaseCount(Integer caseCount) { this.caseCount = caseCount; }
     public LocalDate getStorageTime() { return storageTime; }
     public void setStorageTime(LocalDate storageTime) { this.storageTime = storageTime; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

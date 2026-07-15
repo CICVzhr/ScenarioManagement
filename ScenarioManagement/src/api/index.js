@@ -1,16 +1,48 @@
 const BASE_URL = '/api'
 
 async function request(url, options = {}) {
-  const config = {
-    headers: { 'Content-Type': 'application/json' },
-    ...options
+  const token = localStorage.getItem('token')
+  const { params, ...fetchOptions } = options
+
+  let fullUrl = `${BASE_URL}${url}`
+  if (params) {
+    const searchParams = new URLSearchParams(params)
+    fullUrl += `?${searchParams.toString()}`
   }
 
-  const response = await fetch(`${BASE_URL}${url}`, config)
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+    },
+    ...fetchOptions
+  }
+
+  if (config.headers) {
+    config.headers = { ...config.headers }
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
+    }
+  }
+
+  const response = await fetch(fullUrl, config)
 
   if (response.status === 204) return null
 
-  const data = await response.json()
+  const text = await response.text()
+  if (!text) {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+    return null
+  }
+
+  let data
+  try {
+    data = JSON.parse(text)
+  } catch {
+    throw new Error(text || `HTTP ${response.status}`)
+  }
 
   if (!response.ok) {
     throw new Error(data.error || data.message || `HTTP ${response.status}`)
@@ -19,8 +51,8 @@ async function request(url, options = {}) {
   return data
 }
 
-export function get(url) {
-  return request(url)
+export function get(url, options = {}) {
+  return request(url, options)
 }
 
 export function post(url, body) {
@@ -49,3 +81,5 @@ export function del(url) {
     method: 'DELETE'
   })
 }
+
+export default request

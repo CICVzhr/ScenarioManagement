@@ -63,4 +63,17 @@ public class SceneDesignController {
         Integer modifyCount = request.get("modifyCount");
         return ResponseEntity.ok(sceneDesignService.updateModifyCount(id, modifyCount));
     }
+
+    @PatchMapping("/{id}/submit")
+    public ResponseEntity<SceneDesign> submitSceneDesign(@PathVariable String id, @RequestBody Map<String, String> request) {
+        String status = request.get("status");
+        if (status == null || status.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            return ResponseEntity.ok(sceneDesignService.submitSceneDesign(id, status));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

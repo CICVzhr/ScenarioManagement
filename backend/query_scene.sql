@@ -1,0 +1,1 @@
+SELECT id, name, designer, status, dcid, type, level, create_time FROM scene_design;

@@ -28,17 +28,30 @@
         <span class="menu-icon">🏷️</span>
         <span>标签管理</span>
       </el-menu-item>
-      <el-menu-item index="/system-settings">
-        <span class="menu-icon">⚙️</span>
-        <span>系统设置</span>
-      </el-menu-item>
+
+      <el-sub-menu index="system">
+        <template #title>
+          <span class="menu-icon">⚙️</span>
+          <span>系统管理</span>
+          <el-icon class="arrow-icon"></el-icon>
+        </template>
+        <el-menu-item index="/user-management">
+          <span>用户管理</span>
+        </el-menu-item>
+        <el-menu-item index="/role-management">
+          <span>角色管理</span>
+        </el-menu-item>
+        <el-menu-item index="/permission-management">
+          <span>权限管理</span>
+        </el-menu-item>
+      </el-sub-menu>
     </el-menu>
     <div class="user-footer">
       <div class="user-info">
         <div class="user-avatar">👤</div>
         <div class="user-detail">
-          <span class="user-name">管理员</span>
-          <span class="user-role">系统管理员</span>
+          <span class="user-name">{{ userDisplayName }}</span>
+          <span class="user-role">{{ userDisplayRole }}</span>
         </div>
       </div>
     </div>
@@ -49,9 +62,11 @@
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowDown } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/userStore'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
 const isCollapsed = ref(false)
 
 const mainMenuItems = [
@@ -79,10 +94,16 @@ const handleMenuSelect = (key) => {
   }
 }
 
-defineExpose({
-  toggle: () => {
-    isCollapsed.value = !isCollapsed.value
+const userDisplayRole = computed(() => {
+  if (userStore.userInfo.value) {
+    const roles = userStore.userInfo.value.roles || []
+    return roles.length > 0 ? roles.join(' / ') : '未分配角色'
   }
+  return '未登录'
+})
+
+const userDisplayName = computed(() => {
+  return userStore.userInfo.value?.realName || '管理员'
 })
 </script>
 

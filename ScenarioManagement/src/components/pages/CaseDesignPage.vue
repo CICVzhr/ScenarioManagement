@@ -7,6 +7,7 @@
         </template>
       </el-input>
       <div class="filter-tags">
+        <span class="filter-tag" :class="{ active: filterStatus === '设计中' }" @click="filterStatus = '设计中'">设计中</span>
         <span class="filter-tag" :class="{ active: filterStatus === '开发中' }" @click="filterStatus = '开发中'">开发中</span>
         <span class="filter-tag" :class="{ active: filterStatus === '已完成' }" @click="filterStatus = '已完成'">已完成</span>
       </div>
@@ -35,45 +36,31 @@ import { Search } from '@element-plus/icons-vue'
 import CaseDesignTable from '@/components/tables/CaseDesignTable.vue'
 import ApprovalFlowDrawer from '@/components/drawers/ApprovalFlowDrawer.vue'
 import { useApprovalFlow } from '@/composables/useApprovalFlow'
-import { getSceneDesigns } from '@/api/sceneDesign'
-
-const sceneToCaseStatusMap = {
-  '已完成': '开发中',
-  '设计中': '待设计',
-  '审核中': '待设计',
-  '待验证': '待设计',
-  '修改中': '待设计'
-}
+import { getCaseDesigns } from '@/api/caseDesign'
 
 const searchKeyword = ref('')
 const filterStatus = ref('')
-const sceneDesigns = ref([])
-
-const caseDesignList = computed(() => {
-  return sceneDesigns.value
-    .filter(item => item.stage === 'scenariocase')
-    .map(item => ({
-      ...item,
-      caseStatus: sceneToCaseStatusMap[item.status] || '待设计'
-    }))
-    .filter(item => item.caseStatus !== '待设计')
-})
+const caseDesigns = ref([])
 
 const filteredData = computed(() => {
-  return caseDesignList.value.filter(item => {
+  return caseDesigns.value.filter(item => {
     const matchKeyword = !searchKeyword.value ||
       item.name.toLowerCase().includes(searchKeyword.value.toLowerCase()) ||
       item.id.toLowerCase().includes(searchKeyword.value.toLowerCase())
-    const matchStatus = !filterStatus.value || item.caseStatus === filterStatus.value
+    const matchStatus = !filterStatus.value || item.status === filterStatus.value
     return matchKeyword && matchStatus
   })
 })
 
-onMounted(() => {
-  getSceneDesigns().then(data => {
-    sceneDesigns.value = data
-  })
-})
+const fetchData = async () => {
+  try {
+    caseDesigns.value = await getCaseDesigns()
+  } catch (e) {
+    console.error('Failed to load case designs:', e)
+  }
+}
+
+onMounted(fetchData)
 
 const { showApprovalDrawer, approvalScene, approvalFlowData, openApproval, closeApproval } = useApprovalFlow('case')
 

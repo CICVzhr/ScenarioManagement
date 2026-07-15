@@ -25,6 +25,12 @@ public class CaseDesign {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate createTime;
 
+    @Column(name = "status", length = 50)
+    private String status;
+
+    @Column(name = "scene_id", length = 20)
+    private String sceneId;
+
     public CaseDesign() {}
 
     public String getId() { return id; }
@@ -37,4 +43,8 @@ public class CaseDesign {
     public void setProgress(Integer progress) { this.progress = progress; }
     public LocalDate getCreateTime() { return createTime; }
     public void setCreateTime(LocalDate createTime) { this.createTime = createTime; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getSceneId() { return sceneId; }
+    public void setSceneId(String sceneId) { this.sceneId = sceneId; }
 }
