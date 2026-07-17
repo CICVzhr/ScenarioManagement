@@ -10,4 +10,6 @@ import java.util.List;
 public interface SceneDesignRepository extends JpaRepository<SceneDesign, String> {
     List<SceneDesign> findByStatus(String status);
     List<SceneDesign> findByDesigner(String designer);
+    List<SceneDesign> findByPhase(String phase);
+    List<SceneDesign> findByPhaseIn(List<String> phases);
 }

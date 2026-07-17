@@ -1,5 +1,6 @@
 package com.example.scenario.controller;
 
+import com.example.scenario.dto.SceneDesignFullDTO;
 import com.example.scenario.entity.SceneDesign;
 import com.example.scenario.service.SceneDesignService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,25 @@ public class SceneDesignController {
         return sceneDesignService.getAllSceneDesigns();
     }
 
+    @GetMapping("/phase/{phase}")
+    public List<SceneDesign> getSceneDesignsByPhase(@PathVariable String phase) {
+        return sceneDesignService.getSceneDesignsByPhase(phase);
+    }
+
+    @GetMapping("/full")
+    public List<SceneDesignFullDTO> getAllSceneDesignsFull() {
+        return sceneDesignService.getAllSceneDesignsFullData();
+    }
+
+    @GetMapping("/{id}/full")
+    public ResponseEntity<SceneDesignFullDTO> getSceneDesignFullById(@PathVariable String id) {
+        SceneDesignFullDTO dto = sceneDesignService.getSceneDesignFullData(id);
+        if (dto == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dto);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<SceneDesign> getSceneDesignById(@PathVariable String id) {
         return sceneDesignService.getSceneDesignById(id)
@@ -30,6 +50,12 @@ public class SceneDesignController {
 
     @PostMapping
     public SceneDesign createSceneDesign(@RequestBody SceneDesign sceneDesign) {
+        if (sceneDesign.getPhase() == null || sceneDesign.getPhase().isEmpty()) {
+            sceneDesign.setPhase("scene_design");
+        }
+        if (sceneDesign.getStatus() == null || sceneDesign.getStatus().isEmpty()) {
+            sceneDesign.setStatus("设计中");
+        }
         return sceneDesignService.saveSceneDesign(sceneDesign);
     }
 
@@ -72,6 +98,19 @@ public class SceneDesignController {
         }
         try {
             return ResponseEntity.ok(sceneDesignService.submitSceneDesign(id, status));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PatchMapping("/{id}/advance")
+    public ResponseEntity<SceneDesign> advanceInCurrentPhase(@PathVariable String id, @RequestBody Map<String, String> request) {
+        String action = request.get("action");
+        if (action == null || action.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            return ResponseEntity.ok(sceneDesignService.advanceInCurrentPhase(id, action));
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().build();
         }

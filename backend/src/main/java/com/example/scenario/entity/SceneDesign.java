@@ -49,6 +49,24 @@ public class SceneDesign {
     @Column(name = "stage", length = 50)
     private String stage;
 
+    @Column(name = "phase", length = 50)
+    private String phase;
+
+    @Column(name = "responsible", length = 100)
+    private String responsible;
+
+    @Column(name = "designers", length = 500)
+    private String designers;
+
+    @Column(name = "progress")
+    private Integer progress;
+
+    @Column(name = "design_complete_count")
+    private Integer designCompleteCount;
+
+    @Column(name = "total_designers")
+    private Integer totalDesigners;
+
     public SceneDesign() {}
 
     public String getId() { return id; }
@@ -77,4 +95,16 @@ public class SceneDesign {
     public void setLevel(String level) { this.level = level; }
     public String getStage() { return stage; }
     public void setStage(String stage) { this.stage = stage; }
-} 
+    public String getPhase() { return phase; }
+    public void setPhase(String phase) { this.phase = phase; }
+    public String getResponsible() { return responsible; }
+    public void setResponsible(String responsible) { this.responsible = responsible; }
+    public String getDesigners() { return designers; }
+    public void setDesigners(String designers) { this.designers = designers; }
+    public Integer getProgress() { return progress; }
+    public void setProgress(Integer progress) { this.progress = progress; }
+    public Integer getDesignCompleteCount() { return designCompleteCount; }
+    public void setDesignCompleteCount(Integer designCompleteCount) { this.designCompleteCount = designCompleteCount; }
+    public Integer getTotalDesigners() { return totalDesigners; }
+    public void setTotalDesigners(Integer totalDesigners) { this.totalDesigners = totalDesigners; }
+}

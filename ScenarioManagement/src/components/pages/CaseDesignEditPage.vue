@@ -1,29 +1,43 @@
 <template>
   <div class="page-container">
     <div class="page-toolbar">
-      <el-input v-model="searchKeyword" placeholder="搜索用例..." class="search-input">
+      <el-input v-model="searchKeyword" placeholder="搜索用例设计..." class="search-input">
         <template #prefix>
           <el-icon><Search /></el-icon>
         </template>
       </el-input>
       <div class="filter-tags">
-        <span class="filter-tag" :class="{ active: filterStatus === '开发中' }" @click="filterStatus = '开发中'">开发中</span>
-        <span class="filter-tag" :class="{ active: filterStatus === '测试中' }" @click="filterStatus = '测试中'">测试中</span>
+        <span class="filter-tag" :class="{ active: filterStatus === '设计中' }" @click="filterStatus = '设计中'">设计中</span>
+        <span class="filter-tag" :class="{ active: filterStatus === '审批中' }" @click="filterStatus = '审批中'">审批中</span>
         <span class="filter-tag" :class="{ active: filterStatus === '已完成' }" @click="filterStatus = '已完成'">已完成</span>
       </div>
     </div>
 
     <div class="scenario-list">
       <div class="list-header">
-        <h3>用例开发列表</h3>
+        <h3>用例设计列表</h3>
         <span class="list-count">共 {{ filteredData.length }} 条记录</span>
       </div>
-      <CaseDevTable v-if="!loading" :table-data="filteredData" @view="handleView" @approval="openApproval" />
+      <CaseDesignTableForDesign
+        v-if="!loading"
+        :table-data="filteredData"
+        @view="handleView"
+        @approval="openApproval"
+      />
       <div v-else class="loading-container">
         <el-icon class="is-loading" :size="24"><Loading /></el-icon>
         <span>加载中...</span>
       </div>
     </div>
+
+    <CaseDesignEditDrawer
+      :visible="showEditDrawer"
+      :case-data="selectedCase"
+      @update:visible="showEditDrawer = $event"
+      @close="handleEditClose"
+      @save="handleSave"
+      @submit="handleSubmit"
+    />
 
     <ApprovalFlowDrawer
       :visible="showApprovalDrawer"
@@ -36,17 +50,30 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { Search, Loading } from '@element-plus/icons-vue'
-import CaseDevTable from '@/components/tables/CaseDevTable.vue'
+import CaseDesignTableForDesign from '@/components/tables/CaseDesignTableForDesign.vue'
+import CaseDesignEditDrawer from '@/components/drawers/CaseDesignEditDrawer.vue'
 import ApprovalFlowDrawer from '@/components/drawers/ApprovalFlowDrawer.vue'
+import { getSceneDesignsByPhase, advanceInPhase } from '@/api/sceneDesign'
 import { useApprovalFlow } from '@/composables/useApprovalFlow'
-import { getSceneDesignsByPhase } from '@/api/sceneDesign'
+import { ElMessage } from 'element-plus'
 
 const searchKeyword = ref('')
 const filterStatus = ref('')
 const caseDesigns = ref([])
 const loading = ref(false)
+
+const showEditDrawer = ref(false)
+const showApprovalDrawer = ref(false)
+const selectedCase = ref(null)
+
+const {
+  approvalCase,
+  approvalFlowData,
+  openApproval,
+  closeApproval
+} = useApprovalFlow('case-design')
 
 const filteredData = computed(() => {
   return caseDesigns.value.filter(item => {
@@ -61,21 +88,36 @@ const filteredData = computed(() => {
 const fetchData = async () => {
   loading.value = true
   try {
-    const data = await getSceneDesignsByPhase('case_dev')
+    const data = await getSceneDesignsByPhase('case_design')
     caseDesigns.value = data || []
   } catch (e) {
     console.error('Failed to load case designs:', e)
-    caseDesigns.value = []
+    ElMessage.error('加载失败')
   } finally {
     loading.value = false
   }
 }
 
+const handleView = (row) => {
+  selectedCase.value = row
+  showEditDrawer.value = true
+}
+
+const handleEditClose = () => {
+  selectedCase.value = null
+}
+
+const handleSave = (data) => {
+  fetchData()
+}
+
+const handleSubmit = (result) => {
+  fetchData()
+}
+
 onMounted(fetchData)
 
-const { showApprovalDrawer, approvalCase, approvalFlowData, openApproval, closeApproval } = useApprovalFlow('case-dev')
-
-const handleView = (row) => {}
+defineExpose({ fetchData })
 </script>
 
 <style lang="scss" scoped>

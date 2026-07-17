@@ -19,7 +19,8 @@
     </div>
 
     <div class="tab-content">
-      <SceneDesignPage v-if="activeStep === 'scenariocase'" />
+      <SceneDesignPage v-if="activeStep === 'scenariocase'" ref="sceneDesignPageRef" />
+      <CaseDesignEditPage v-else-if="activeStep === 'casedesign'" />
       <CaseDesignPage v-else-if="activeStep === 'testcase'" />
     </div>
 
@@ -36,15 +37,18 @@
 import { ref, onMounted } from 'vue'
 import ActionButton from '@/components/common/ActionButton.vue'
 import SceneDesignPage from '@/components/pages/SceneDesignPage.vue'
+import CaseDesignEditPage from '@/components/pages/CaseDesignEditPage.vue'
 import CaseDesignPage from '@/components/pages/CaseDesignPage.vue'
 import CreateScenarioDrawer from '@/components/drawers/CreateScenarioDrawer.vue'
 import { getSceneDesigns, createSceneDesign } from '@/api/sceneDesign'
 
 const showCreateModal = ref(false)
 const activeStep = ref('scenariocase')
+const sceneDesignPageRef = ref(null)
 
 const designSteps = [
   { id: 'scenariocase', title: '场景设计' },
+  { id: 'casedesign', title: '用例设计' },
   { id: 'testcase', title: '用例开发' }
 ]
 
